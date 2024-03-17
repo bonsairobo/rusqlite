@@ -162,7 +162,7 @@ impl From<ValueRef<'_>> for Value {
                 let s = std::str::from_utf8(s).expect("invalid UTF-8");
                 Value::Text(s.to_string())
             }
-            ValueRef::Blob(b) => Value::Blob(b.to_vec()),
+            ValueRef::Blob(b) => Value::Blob(b.into()),
         }
     }
 }

@@ -1,4 +1,5 @@
 use super::{Null, Type};
+use tinyvec::TinyVec;
 
 /// Owning [dynamic type value](http://sqlite.org/datatype3.html). Value's type is typically
 /// dictated by SQLite (not by the caller).
@@ -16,7 +17,7 @@ pub enum Value {
     /// The value is a text string.
     Text(String),
     /// The value is a blob of data
-    Blob(Vec<u8>),
+    Blob(TinyVec<[u8; 16]>),
 }
 
 impl From<Null> for Value {
@@ -47,7 +48,7 @@ impl From<i128> for Value {
     fn from(i: i128) -> Value {
         // We store these biased (e.g. with the most significant bit flipped)
         // so that comparisons with negative numbers work properly.
-        Value::Blob(i128::to_be_bytes(i ^ (1_i128 << 127)).to_vec())
+        Value::Blob(i128::to_be_bytes(i ^ (1_i128 << 127)).into())
     }
 }
 
@@ -56,7 +57,7 @@ impl From<i128> for Value {
 impl From<uuid::Uuid> for Value {
     #[inline]
     fn from(id: uuid::Uuid) -> Value {
-        Value::Blob(id.as_bytes().to_vec())
+        Value::Blob(id.into_bytes().into())
     }
 }
 
@@ -109,7 +110,7 @@ impl From<String> for Value {
 impl From<Vec<u8>> for Value {
     #[inline]
     fn from(v: Vec<u8>) -> Value {
-        Value::Blob(v)
+        Value::Blob(TinyVec::Heap(v))
     }
 }
 

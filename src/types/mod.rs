@@ -139,6 +139,8 @@ impl fmt::Display for Type {
 
 #[cfg(test)]
 mod test {
+    use tinyvec::tiny_vec;
+
     use super::Value;
     use crate::{params, Connection, Error, Result, Statement};
     use std::os::raw::{c_double, c_int};
@@ -348,7 +350,7 @@ mod test {
         let mut rows = stmt.query([])?;
 
         let row = rows.next()?.unwrap();
-        assert_eq!(Value::Blob(vec![1, 2]), row.get::<_, Value>(0)?);
+        assert_eq!(Value::Blob(tiny_vec!(1, 2)), row.get::<_, Value>(0)?);
         assert_eq!(Value::Text(String::from("text")), row.get::<_, Value>(1)?);
         assert_eq!(Value::Integer(1), row.get::<_, Value>(2)?);
         match row.get::<_, Value>(3)? {
